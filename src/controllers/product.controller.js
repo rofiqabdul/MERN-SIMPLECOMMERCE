@@ -134,7 +134,92 @@ export const createProduct = async (req, res) => {
 		);
 	}
 };
-// updateProduct,
-export const updateProduct = async (req, res) => {};
-// deleteProduct,
-export const deleteProduct = async (req, res) => {};
+
+export const updateProduct = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const { name, price, stock, description, inventoryId } = req.body;
+		const image = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+		const product = await prisma.product.findUnique({ where: { id } });
+		if (!product) return errorResponse(res, "product not found", null, 404);
+
+		if (image && product.image) {
+			const oldImagePath = path.join(
+				process.cwd(),
+				"uploads",
+				path.basename(product.image)
+			);
+
+			fs.unlink(oldImagePath, (err) => {
+				if (err) {
+					console.warn("Gagal hapus file lama: ", oldImagePath);
+				} else {
+					console.log("File lama terhapus: ", oldImagePath);
+				}
+			});
+		}
+		const changedProduct = {
+			name,
+			price: parseFloat(price),
+			stock: parseInt(stock),
+			description,
+			inventoryId,
+		};
+		if (image) changedProduct.image = image;
+
+		const updatedProduct = await prisma.product.update({
+			where: { id },
+			data: changedProduct,
+		});
+
+		const baseUrl = `${req.protocol}://${req.get("host")}`;
+
+		return successRespone(res, "Update product successful", {
+			...updatedProduct,
+			image: updatedProduct.image ? `${baseUrl}${updatedProduct.image}` : null,
+		});
+	} catch (error) {
+		return errorResponse(
+			res,
+			"Upload product failed",
+			{ error: error.message },
+			500
+		);
+	}
+};
+
+export const deleteProduct = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const product = await prisma.product.findUnique({ where: { id } });
+		if (!product) return errorResponse(res, "product not found", null, 404);
+
+		if (product.image) {
+			const oldImagePath = path.join(
+				process.cwd(),
+				"uploads",
+				path.basename(product.image)
+			);
+
+			fs.unlink(oldImagePath, (err) => {
+				if (err) {
+					console.warn("Gagal hapus file lama: ", oldImagePath);
+				} else {
+					console.log("File lama terhapus: ", oldImagePath);
+				}
+			});
+		}
+
+		await prisma.product.delete({ where: { id } });
+		return successRespone(res, "Delete product successful");
+	} catch (error) {
+		return errorResponse(
+			res,
+			"Delete product failed",
+			{ error: error.message },
+			500
+		);
+	}
+};
