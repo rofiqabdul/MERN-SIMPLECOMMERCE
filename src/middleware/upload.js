@@ -18,4 +18,4 @@ const fileFilter = (req, file, cb) => {
 	else cb(new Error("Hanya file PNG/JPG/JPEG yang diperbolehkan"));
 };
 
-const upload = multer({ storage: storage, fileFilter });
+export const upload = multer({ storage: storage, fileFilter });
