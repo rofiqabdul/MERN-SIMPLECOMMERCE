@@ -1,6 +1,6 @@
 import express from "express";
 import {
-	getInventories,
+	listInventories,
 	getInventory,
 	createInventory,
 	updateInventory,
@@ -11,7 +11,7 @@ import { verifyToken } from "../middleware/verifyToken.js";
 const router = express.Router();
 
 router.use(verifyToken);
-router.get("/", getInventories);
+router.get("/", listInventories);
 router.get("/:id", getInventory);
 router.post("/", createInventory);
 router.put("/:id", updateInventory);

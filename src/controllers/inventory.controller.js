@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.js";
 import { successRespone, errorResponse } from "../utils/response.js";
 
-export const getInventories = async (req, res) => {
+export const listInventories = async (req, res) => {
 	const inventories = await prisma.inventory.findMany();
 	return successRespone(res, "get inventory successful", inventories);
 };
