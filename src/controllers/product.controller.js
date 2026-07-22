@@ -79,10 +79,10 @@ export const getProductById = async (req, res) => {
 		}
 
 		const base = `${req.protocol}://${req.get("host")}`;
-		const productWithImageUrl = product.map((item) => ({
+		const productWithImageUrl = {
 			...item,
 			image: item.image ? cleanImageUrl(base, item.image) : null,
-		}));
+		};
 
 		return successRespone(
 			res,
